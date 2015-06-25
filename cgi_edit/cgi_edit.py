@@ -1,27 +1,35 @@
 #!/usr/bin/python
 
+from os.path import join,abspath
+import cgi,sys
 
-import cgi
+print 'Content-type: text/html\n'
+
+BASE_DIR = abspath('data')
 form = cgi.FieldStorage()
+filename = form.getvalue('filename')
+if not filename:
+    print 'Please enter a file name'
+    sys.exit()
 
+text = open(join(BASE_DIR, filename)).read()
 
-text = form.getvalue('text', open('simple_edit.dat').read())
-f = open('simple_edit.dat', 'w')
-f.write(text)
-f.close()
-
-print """Content-type: text/html
-
+print """
 <html>
   <head>
-    <title>A Simple Editor</title>
+    <title>Editing...</title>
   </head>
   <body>
-    <form action='simple_edit.cgi' method='POST'>
-    <textarea rows='10' cols='20' name='text'>%s</textarea><br />
-    <input type='submit' />
+    <form action='save.cgi' method='POST'>
+      <b>File:</b> %s<br />
+      <input type='hidden' value='%s' name='filename' />
+      <b>Password:</b><br />
+      <input name='password' type='password' /><br />
+      <b>Text:</b><br />
+      <textarea name='text' cols='40' rows='20'>%s</textarea><br />
+      <input type='submit' value='Save' />
     </form>
   </body>
 </html>
-""" % text
+""" % (filename, filename, text)
 
